@@ -1,0 +1,44 @@
+# The main job for data_quality_demo.
+resources:
+  jobs:
+    data_quality_demo_job:
+      name: data_quality_demo_job
+
+      tasks:
+        - task_key: 0_initialize_env
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: data_quality_demo/src/0_initialize_env
+            source: GIT
+
+        - task_key: 1_bronze_to_silver
+          job_cluster_key: job_cluster
+          depends_on: 
+            - task_key: 0_initialize_env
+          notebook_task:
+            notebook_path: data_quality_demo/src/1_bronze_to_silver
+            source: GIT
+
+        - task_key: dlt_initialize_env
+          job_cluster_key: job_cluster
+          notebook_task:
+            notebook_path: data_quality_demo/src/dlt_quality_rules
+            source: GIT
+            
+        - task_key: refresh_dlt_pipeline
+          depends_on:
+            - task_key: dlt_initialize_env
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.data_quality_demo_pipeline.id}
+            full_refresh: true
+        
+      job_clusters:
+        - job_cluster_key: job_cluster
+          new_cluster:
+            spark_version: 14.3.x-scala2.12
+            node_type_id: m5d.large
+            num_workers: 1
+      git_source:
+        git_url: https://github.com/SpeakingData/databricks_demos
+        git_provider: gitHub
+        git_branch: main

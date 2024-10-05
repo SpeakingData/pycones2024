@@ -1,0 +1,23 @@
+# This is a Databricks asset bundle definition for data_quality_demo.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: data_quality_demo
+
+include:
+  - resources/*.yml
+
+targets:
+  # The 'dev' target, for development purposes. This target is the default.
+  dev:
+    # We use 'mode: development' to indicate this is a personal development copy:
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default
+    # - The 'development' mode is used for Delta Live Tables pipelines
+    mode: development
+    default: true
+    workspace:
+      host: https://{yourDatabricks}.cloud.databricks.com
+
+
+
+
